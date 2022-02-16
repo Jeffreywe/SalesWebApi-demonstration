@@ -27,6 +27,7 @@ namespace SalesWebApi {
                 x.UseSqlServer(connStr); // passes our connStr into the sql server, x into our services
             });
             services.AddControllers();
+            services.AddCors(); // adds a block on preventing unauthorized clients from accessing our data
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,6 +35,9 @@ namespace SalesWebApi {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()); // tells our controller that we are gonna allow any other client to talk to our server,
+                                                                                    // accepts a call to service if it comes from same ipaddress
 
             app.UseRouting();
 
