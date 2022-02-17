@@ -24,15 +24,20 @@ namespace SalesWebApi.Controllers
         [HttpGet] // http method used in postman
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders() // methods get marked asynch, return type has to be a task as name suggests
         {
-            return await _context.Orders.Include(x => x.Customer).ToListAsync(); // await generally goes before reading or updating database
-                                // include( => table) includes the customer table pk to fk in orders
+            return await _context.Orders  // await generally goes before reading or updating database
+                                    .Include(x => x.Customer) // include( => table) includes the customer table pk to fk in orders
+                                    .Include(x => x.Orderlines) // includes orderlines in the search for the Order
+                                    .ToListAsync();
+                                
         }
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
-            var order = await _context.Orders.Include(x => x.Customer) // include includes CUstomer pk with the result set for order
+            var order = await _context.Orders
+                                        .Include(x => x.Customer) // include includes Customer with the result set for order
+                                        .Include(x => x.Orderlines) // includes orderlines in the result
                                         .SingleOrDefaultAsync(x => x.Id == id); // single or default async gets the Id from orders and matches it with id
 
             if (order == null)

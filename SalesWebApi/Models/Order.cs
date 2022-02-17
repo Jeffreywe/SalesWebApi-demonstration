@@ -18,6 +18,8 @@ namespace SalesWebApi.Models {
         public int CustomerId { get; set; }
         public virtual Customer Customer { get; set; } // this statement EF recognizes CustomerId as a foreign key
 
+        public virtual IEnumerable<Orderline> Orderlines { get; set; } // fills all the line items associated with an order when we read an order
+            // virtual means its only in the class not in the database table
         public Order() { }
     }
 }
