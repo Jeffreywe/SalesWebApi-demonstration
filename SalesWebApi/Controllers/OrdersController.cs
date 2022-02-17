@@ -19,6 +19,19 @@ namespace SalesWebApi.Controllers
         {
             _context = context;
         }
+        // when you create your own methods , you have to make sure the methods are named differently to other methods in our controllers otherwise they wont work
+        // PUT: api/Orders/Recalc/5
+        [HttpPut("recalc/{orderId}")]
+        public async Task<ActionResult> RecalculateOrder(int orderId) {
+            var order = await _context.Orders.FindAsync(orderId);
+
+            var sum = order.Orderlines.Sum(x => x.Quantity * x.Price); // sums the quantity with the price and stores it into sum var
+            
+            order.Total = sum;
+            await _context.SaveChangesAsync(); // await stops the whole method until the SaveChanges is completed
+
+            return NotFound();
+        }
 
         // GET: api/Orders
         [HttpGet] // http method used in postman
@@ -51,6 +64,7 @@ namespace SalesWebApi.Controllers
         // PUT: api/Orders/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+                        // interface for returning a error message?
         public async Task<IActionResult> PutOrder(int id, Order order)
         {
             if (id != order.Id)
