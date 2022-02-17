@@ -9,9 +9,9 @@ using SalesWebApi.Models;
 
 namespace SalesWebApi.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class OrdersController : ControllerBase
+    [Route("api/[controller]")] // this routes to url
+    [ApiController] // identifies correct controller
+    public class OrdersController : ControllerBase // must inherit from control base
     {
         private readonly AppDbContext _context;
 
@@ -21,17 +21,19 @@ namespace SalesWebApi.Controllers
         }
 
         // GET: api/Orders
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
+        [HttpGet] // http method used in postman
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrders() // methods get marked asynch, return type has to be a task as name suggests
         {
-            return await _context.Orders.ToListAsync();
+            return await _context.Orders.Include(x => x.Customer).ToListAsync(); // await generally goes before reading or updating database
+                                // include( => table) includes the customer table pk to fk in orders
         }
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders.Include(x => x.Customer) // include includes CUstomer pk with the result set for order
+                                        .SingleOrDefaultAsync(x => x.Id == id); // single or default async gets the Id from orders and matches it with id
 
             if (order == null)
             {

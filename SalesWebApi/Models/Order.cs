@@ -16,7 +16,7 @@ namespace SalesWebApi.Models {
         public decimal Total { get; set; }
 
         public int CustomerId { get; set; }
-        public virtual Customer Customer { get; set; }
+        public virtual Customer Customer { get; set; } // this statement EF recognizes CustomerId as a foreign key
 
         public Order() { }
     }
