@@ -23,7 +23,9 @@ namespace SalesWebApi.Controllers
         // PUT: api/Orders/Recalc/5
         [HttpPut("recalc/{orderId}")]
         public async Task<ActionResult> RecalculateOrder(int orderId) {
-            var order = await _context.Orders.FindAsync(orderId);
+            var order = await _context.Orders
+                             .Include(x => x.Orderlines)
+                             .SingleOrDefaultAsync(x => x.Id == orderId);
 
             var sum = order.Orderlines.Sum(x => x.Quantity * x.Price); // sums the quantity with the price and stores it into sum var
             
@@ -36,7 +38,7 @@ namespace SalesWebApi.Controllers
         // GET: api/Orders
         [HttpGet] // http method used in postman
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders() // methods get marked asynch, return type has to be a task as name suggests
-        {
+        {                           // IEnum is a interface
             return await _context.Orders  // await generally goes before reading or updating database
                                     .Include(x => x.Customer) // include( => table) includes the customer table pk to fk in orders
                                     .Include(x => x.Orderlines) // includes orderlines in the search for the Order
@@ -72,8 +74,10 @@ namespace SalesWebApi.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(order).State = EntityState.Modified;
-
+            _context.Entry(order).State = EntityState.Modified; // when you send request to server and it gets received,
+                                                                // server doesnt remember that we Put(made changes) so you have to use this line of code
+                                                                // for savechanges to update database because it marks the chnages so server can recognize it as a change
+                                                                // async lets you use program if it is freezed up, sync just sits there until the call comes back from server
             try
             {
                 await _context.SaveChangesAsync();
